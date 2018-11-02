@@ -1,0 +1,8 @@
+---
+- hosts: local
+  become: yes
+  roles:
+    - common
+    - fedora_common
+    - kde_common
+    - fedora_28_kde

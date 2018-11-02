@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+# baseline-satctl provisioning script adapted from 
+# Streisand commit: fcfb0d560cd4c8fa20e55c5a49ac111bf80b175b
+# https://github.com/StreisandEffect/streisand
+
+# Set errexit option to exit immediately on any non-zero status return
+set -e
+
+echo -e "\n\033[38;5;255m\033[48;5;234m\033[1m  BASELINE-ANSIBLE v0.1 \033[0m\n"
+
+SCRIPT_DIR="$(cd -P "$(dirname "$0")" 2>/dev/null && pwd -P)"
+
+# DEFAULT_SITE_VARS="$SCRIPT_DIR/global_vars/default-site.yml"
+GLOBAL_VARS="$SCRIPT_DIR/global_vars/vars.yml"
+HOME_DIR="$HOME/.baseline"
+# SITE_VARS="$HOME_DIR/site.yml"
+
+# Include the check_ansible function from ansible_check.sh
+source util/ansible_check.sh
+
+function init_homedir() {
+  if [ ! -d "$HOME_DIR" ]; then
+    mkdir "$HOME_DIR"
+    echo "Created new baseline home directory: $HOME_DIR"
+  fi
+}
+
+# check_python checks whether the 'python' interpreter is Python 2 or Python 3.
+# If it is Python 2 then the inventory file is updated to set the
+# ansible_interpretter host var explicitly
+function check_python() {
+  local PYTHON_VERSION
+  PYTHON_VERSION="$(python --version 2>/dev/null)"
+
+  if [[ -n $PYTHON_VERSION && ! $PYTHON_VERSION =~ ^Python\ 2\..* ]]; then
+    local INVENTORY_DIR="$SCRIPT_DIR/inventory/"
+    for INV_FILE in "$INVENTORY_DIR"/*; do
+      sed 's/=python$/=python2.7/' "$INV_FILE" > "$INV_FILE.new"
+      mv "$INV_FILE.new" "$INV_FILE"
+      git -C "$INVENTORY_DIR" update-index --assume-unchanged "$INV_FILE" 2>/dev/null || true
+    done
+  fi
+}
+
+# validate runs the validation role to check the consistency of the satctl
+# service vars (e.g. that at least one service is enabled after customization of
+# $SITE_VARS).
+function validate() {
+  local NEW_SERVER_PROVISIONING=$1
+  if [ -z "${NEW_SERVER_PROVISIONING}" ]; then
+    NEW_SERVER_PROVISIONING=true
+  fi
+  
+  echo; echo; ansible-playbook \
+    --extra-vars="@$GLOBAL_VARS" \
+    --extra-vars="@$DEFAULT_SITE_VARS" \
+    --extra-vars="@$SITE_VARS" \
+    --extra-vars="satctl_new_server_provisioning=$NEW_SERVER_PROVISIONING" \
+    playbooks/validate.yml
+}
+
+# run_genesis invokes the genesis playbook file specified by the first argument
+# to the function, or `satctl.yml` if none is provided. It uses the second
+# argument to the function as the inventory or `inventory/inventory` if none
+# is provided.
+function run_genesis() {
+  local GENESIS_PLAYBOOK=$1
+  local ASK_BECOME=""
+  if [ -z "${GENESIS_PLAYBOOK}" ]; then
+    GENESIS_PLAYBOOK=common.yml
+  fi
+  local GENESIS_INVENTORY=$2
+  if [ -z "${GENESIS_INVENTORY}" ]; then
+    GENESIS_INVENTORY=$SCRIPT_DIR/inventory/inventory
+  fi
+
+#  if [ -n "${SSH_USER}" ] && [ "$SSH_USER" != "root" ]; then
+  if [ "$SSH_USER" != "root" ]; then
+    ASK_BECOME="--ask-become-pass"
+  fi
+  
+  # Run the specified genesis playbook with the specified Ansible inventory
+  echo; echo; ansible-playbook \
+    -i $GENESIS_INVENTORY \
+    --extra-vars="@$GLOBAL_VARS" \
+    $ASK_BECOME \
+    $SCRIPT_DIR/playbooks/$GENESIS_PLAYBOOK
+}
+
+# be_careful_friend asks you to pay attention because you're about to do
+# something that might be impossible to undo!
+function cuidado_amigo() {
+  read -r -p "$1" confirm
+  case "$confirm" in
+    satctl) echo; echo "Confirmed. Continuing";;
+    *) echo; echo "Cancelling & exiting."; exit 1;;
+  esac
+}
+
+# local_provision handles provisioning the same machine as is running the
+# satctl script/Ansible. It performs an additional "ARE YOU SURE" step before
+# invoking ansible-playbook. 
+function local_provision() {
+  cuidado_amigo "
+LOCAL PROVISIONING WILL OVERWRITE CONFIGURATION ON **THIS** MACHINE.
+THE MACHINE YOU ARE CURRENTLY EXECUTING THIS SHELL SCRIPT ON.
+ARE YOU 100% SURE THAT YOU WISH TO CONTINUE?
+
+Please enter the word 'satctl' to continue: "
+
+  run_genesis localhost.yml inventory/inventory-local-provision
+}
+
+function existing_server() {
+  read -r -p "What is the IP of the existing server: " SERVER_IP
+
+  cuidado_amigo "
+THIS WILL OVERWRITE CONFIGURATION ON THE EXISTING SERVER.
+SATCTL ASSUMES $SERVER_IP IS A BRAND NEW UBUNTU INSTANCE AND WILL
+NOT PRESERVE EXISTING CONFIGURATION OR DATA.
+
+ARE YOU 100% SURE THAT YOU WISH TO CONTINUE?
+
+Please enter the word 'satctl' to continue: "
+
+  # If ANSIBLE_SSH_USER is empty, default to root
+  if [ -z "${ANSIBLE_SSH_USER}" ]; then
+    SSH_USER='root'
+  # Otherwise, use whatever ANSIBLE_SSH_USER is set to as the SSH_USER
+  else
+    SSH_USER=${ANSIBLE_SSH_USER}
+  fi
+
+  # Create an inventory file string on the fly
+  read -r -d '' TEMPL << EOF || true
+[localhost]
+localhost ansible_connection=local ansible_python_interpreter=python
+[satctl-host]
+$SERVER_IP ansible_user=$SSH_USER
+EOF
+
+  # Create the inventory file
+  echo "$TEMPL" > inventory/inventory-existing
+  # Invoke the Satctl playbook on the existing server inventory
+  run_genesis existing-server.yml inventory/inventory-existing
+}
+
+# Make sure the system is ready for the playbooks
+init_homedir
+check_python
+check_ansible
+
+# Figure out which genesis role to invoke
+read -r -p "What are we baselining?
+  1. Kubuntu 18.04
+  2. KDE Neon 18.04
+  3. Fedora 28/KDE
+: " reply
+
+case "$reply" in
+  1) run_genesis kubuntu_1804.yml;;
+  2) run_genesis kde_neon_1804.yml;;
+  3) run_genesis fedora_28_kde.yml;;
+  4) exit 0;;
+  *) echo; echo "Invalid selection."; exit 1;;
+esac

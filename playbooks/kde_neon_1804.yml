@@ -1,0 +1,8 @@
+---
+- hosts: local
+  become: yes
+  roles:
+    - common
+    - ubuntu_common
+    - kde_common
+    - kde_neon_1804

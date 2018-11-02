@@ -1,0 +1,80 @@
+---
+- hosts: local
+  become: yes
+  tasks:
+    - name: Configure git
+      command: git config --global {{ item.param }} {{ item.value }}
+      with_items:
+        - { param: "user.name", value: "Kevin K." }
+        - { param: "user.email", value: "kbknapp@gmail.com" }
+        - { param: "rebase.autosquash", value: "true" }
+        - { param: "color.ui", value: "true" }
+
+    - name: Install rustup
+      shell: curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly
+
+    - name: Install flatpak apps
+      command: flatpak install {{ item }}
+      with_items:
+        - com.discordapp.Discord 
+        - org.telegram.desktop 
+        - flathub com.slack.Slack 
+        - com.googleplaymusicdesktopplayer.GPMD
+        - com.visualstudio.code
+        - org.signal.Signal
+        - org.qownnotes.QOwnNotes
+      when:
+        - not is_server
+
+    - name: Install Cargo Tools
+      command: cargo install {{ item }}
+      with_items:
+        - just
+        - tokei
+        - cargo-tree
+        - mdbook
+        - cargo-edit
+        - cargo-outdated
+        - cargo-update
+        - cargo-bloat
+        - cargo-count
+        - clog-cli
+        - bat
+        - exa
+      when:
+        - not is_server
+
+    - name: Clone common repos
+      command: git clone https://github.com/{{item.user}}/{{item.repo}} {{item.local}}
+        args:
+          chdir: /home/kevin/{{item.dir}}
+      with_items:
+        - {user: "kbknapp", repo: "dotfiles", dir: "", local: ".dotfiles"}
+        - {user: "BurntSushi", repo: "ripgrep", dir: "Projects", local: ""}
+        - {user: "robbyrussell", repo: "oh-my-zsh", dir: "", local: ".oh-my-zsh"}
+        - {user: "clap-rs", repo: "clap", dir: "Projects", local: ""}
+        - {user: "clap-rs", repo: "clap_derive", dir: "Projects", local: ""}
+        - {user: "clap-rs", repo: "clap_generate", dir: "Projects", local: ""}
+      when:
+        - not is_server
+
+    - name: Gather ZSH binary info
+      command: which zsh
+      register: which_zsh_result
+
+    - name: Change User Shell
+      command: chsh -s {{ which_zsh_result.stdout }} kevin
+
+    - name: Setup ZSH
+      copy:
+        path: /home/kevin/.dotfiles/zsh/.zshrc-linux
+    
+    - name: Install pip apps
+      command: pip install s-tui
+      when:
+        - not is_server
+
+    # - name: Install snap apps
+    #   command: snap install {{ item }}
+    #   with_items:
+    #     - signal-desktop

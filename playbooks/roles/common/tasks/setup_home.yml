@@ -1,0 +1,14 @@
+---
+- name: Setup Home Directories
+  file:
+    path: "/home/kevin/{{ item }}"
+    state: directory
+    owner: kevin
+    group: kevin
+  with_items: 
+    - .bin
+    - .local
+    - .local/bin
+    - Projects
+    - .tmp
+    - .build
