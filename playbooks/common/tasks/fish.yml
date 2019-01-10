@@ -1,5 +1,7 @@
 ---
 - name: Add Fish v2 PPA (Ubuntu)
+  become: yes
+  become_user: root
   apt_repository:
     repo: ppa:fish-shell/release-2
   when: 
@@ -7,6 +9,8 @@
     - ansible_distribution_release != "cosmic"
 
 - name: Add Fish v3 PPA (Ubuntu)
+  become: yes
+  become_user: root
   apt_repository:
     repo: ppa:fish-shell/release-3
   when: 
@@ -14,6 +18,8 @@
     - ansible_distribution_release == "cosmic"
 
 - name: Install FISH (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: fish
     state: latest

@@ -1,12 +1,4 @@
 ---
-- name: Install ZSH (Ubuntu)
-  apt:
-    name: zsh
-    state: latest
-  when: 
-    - ansible_distribution == "Ubuntu"
-    - component_zsh
-
 - name: Clone oh-my-zsh repository
   git:
     repo: https://github.com/robbyrussell/oh-my-zsh

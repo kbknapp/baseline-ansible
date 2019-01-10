@@ -1,6 +1,7 @@
 ---
 - hosts: localhost
   become: yes
+  become_user: kevin
   vars:
     gpg_key_id: 17218E4B3692F01A
 
@@ -35,6 +36,17 @@
     # CLI Apps
     component_rtv: yes
     component_asciinema: yes # requires Rust
+    component_rust_ripgrep: yes
+    component_rust_cw: yes
+    component_rust_exa: yes
+    component_rust_skim: yes
+    component_rust_mdbook: yes
+    component_rust_bat: yes
+    component_rust_fd: yes
+    component_rust_tokei: yes
+    component_rust_clog: yes
+    component_rust_hexl: yes
+    component_rust_hyperfine: yes
     # CLI Apps Dev
     component_vim: yes
     component_rust: yes
@@ -75,6 +87,7 @@
     component_vscode: yes
     # Settings
     component_swapfile: yes
+
   roles:
     - common
     - server

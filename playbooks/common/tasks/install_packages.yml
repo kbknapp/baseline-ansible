@@ -1,5 +1,7 @@
 ---
 - name: Install Common Packages (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: "{{ item }}"
     state: latest
@@ -9,3 +11,13 @@
     - xclip
   when: 
     - ansible_distribution == "Ubuntu"
+
+- name: Install ZSH (Ubuntu)
+  become: yes
+  become_user: root
+  apt:
+    name: zsh
+    state: latest
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_zsh

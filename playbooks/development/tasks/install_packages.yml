@@ -1,5 +1,7 @@
 ---
 - name: Install FiraCode Fonts (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: fonts-firacode
     state: latest
@@ -9,6 +11,8 @@
     - component_fonts_firacode
 
 - name: Install git (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: git
     state: latest
@@ -17,6 +21,8 @@
     - component_git
 
 - name: Install meld (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: meld
     state: latest
@@ -26,6 +32,8 @@
     - component_meld
 
 - name: Install vim (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: vim
     state: latest
@@ -52,6 +60,8 @@
     - component_gitkraken
 
 - name: Install CLion (Snap)
+  become: yes
+  become_user: root
   command: snap install clion --classic
   args:
     creates: /snap/clion

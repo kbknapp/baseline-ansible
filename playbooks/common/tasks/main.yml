@@ -1,7 +1,18 @@
 ---
 - include: update_system.yml
+- include: kubuntu_backports.yml
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_gui
+    - gui_kde or component_kubuntu_backports
 - include: install_packages.yml
 - include: common_directories.yml
+- include_tasks: zsh.yml
+  when: 
+    - component_zsh
+- include_tasks: fish.yml
+  when: 
+    - component_fish
 - include: flatpak.yml
   when:
     - component_flatpak
@@ -14,9 +25,3 @@
 - include: npm.yml
   when:
     - component_npm
-
-- include: kubuntu_backports.yml
-  when: 
-    - ansible_distribution == "Ubuntu"
-    - component_gui
-    - gui_kde or component_kubuntu_backports

@@ -1,4 +1,18 @@
 ---
+- name: Install VIM (Ubuntu)
+  become: yes
+  become_user: root
+  apt:
+    name: vim
+    state: latest
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_vim
+# - name: Move Vim dirs to user home dir
+#   command: "cp -r /root/.viminfo /home/kevin"
+#   args:
+#     creates: "/home/kevin/.viminfo"
+
 - name: Copy vim settings from dotfiles
   command: "cp -r /home/kevin/.dotfiles/vim /home/kevin/.vim"
   args:

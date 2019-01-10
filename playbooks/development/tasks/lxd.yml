@@ -1,5 +1,7 @@
 ---
 - name: Install LXD (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: "{{ item }}"
     state: latest
@@ -10,6 +12,8 @@
     - (ansible_distribution == "Ubuntu") 
 
 - name: Append kevin to the lxd group
+  become: yes
+  become_user: root
   user:
     name: kevin
     groups: lxd

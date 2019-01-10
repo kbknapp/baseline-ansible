@@ -1,9 +1,13 @@
 ---
 - name: Add Kubuntu Backports PPA (Kubuntu)
+  become: yes
+  become_user: root
   apt_repository:
     repo: ppa:kubuntu-ppa/backports
 
 - name: Perform Full Upgrade from Backports (Kubuntu)
+  become: yes
+  become_user: root
   apt:
     upgrade: full
     update_cache: yes

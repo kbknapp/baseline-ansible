@@ -1,5 +1,7 @@
 ---
 - name: Install tilix (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: tilix
     state: latest
@@ -10,6 +12,8 @@
     - component_tilix
 
 - name: Create symbolic link to fix tilix (Ubuntu)
+  become: yes
+  become_user: root
   file:
     src: "/etc/profile.d/vte-2.91.sh"
     dest: "/etc/profile.d/vte.sh"
@@ -20,6 +24,8 @@
     - component_tilix
 
 - name: Install mpv player (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: mpv
     state: latest
@@ -29,6 +35,8 @@
     - component_mpv
 
 - name: Install rtv (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: rtv
     state: latest
@@ -37,6 +45,8 @@
     - component_rtv
 
 - name: Download and Install Keybase (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     deb: "https://prerelease.keybase.io/keybase_amd64.deb"
   when: 
@@ -45,6 +55,8 @@
     - component_keybase
 
 - name: Install missing packages (Ubuntu)
+  become: yes
+  become_user: root
   command: apt-get -y install -f
   when: 
     - ansible_distribution == "Ubuntu"
@@ -97,6 +109,8 @@
     - component_flatpak
 
 - name: Install Mailspring (Snap)
+  become: yes
+  become_user: root
   command: snap install mailspring --classic
   args:
     creates: /snap/mailspring

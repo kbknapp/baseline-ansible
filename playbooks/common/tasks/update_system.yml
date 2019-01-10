@@ -1,5 +1,7 @@
 ---
 - name: update the system (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: "*"
     state: latest
@@ -8,6 +10,8 @@
     - ansible_distribution == "Ubuntu"
 
 - name: update the system (Fedora)
+  become: yes
+  become_user: root
   dnf:
     name: "*"
     state: latest

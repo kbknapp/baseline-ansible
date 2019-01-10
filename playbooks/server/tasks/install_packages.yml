@@ -1,8 +1,1 @@
 ---
-- name: Install VIM (Ubuntu)
-  apt:
-    name: vim
-    state: latest
-  when: 
-    - ansible_distribution == "Ubuntu"
-    - component_vim

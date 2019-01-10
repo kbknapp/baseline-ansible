@@ -1,5 +1,7 @@
 ---
 - name: Add Snapd (Fedora)
+  become: yes
+  become_user: root
   dnf:
     name: snapd
     state: latest
@@ -7,6 +9,8 @@
     - ansible_distribution == "Fedora"
 
 - name: Fix Links for Snapd (Fedora)
+  become: yes
+  become_user: root
   file:
     src: "/var/lib/snapd/snap"
     dest: "/snap"

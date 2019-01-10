@@ -7,10 +7,18 @@
 
 - name: Install rustup
   shell: "/home/kevin/.tmp/rustup-install.sh -y"
-  become_user: kevin
   args:
     creates: /home/kevin/.cargo
     executable: sh
+
+# - name: Move Rust dirs to user home dir
+#   command: "cp -r /root/{{ item }} /home/kevin"
+#   args:
+#     creates: "/home/kevin/{{ item }}"
+#   with_items:
+#     - ".cargo"
+#     - ".rustup"
+#     - ".multirust"
 
 - name: Source the Cargo ENV files
   shell: source /home/kevin/.cargo/env
@@ -22,7 +30,6 @@
     path: "/home/kevin/.config/fish/config.fish"
     line: "set -gx PATH /home/kevin/.cargo/bin $PATH"
   when:
-    - default_shell == "fish"
     - component_fish
 
 - name: Add Rust to $PATH (ZSH)
@@ -30,14 +37,16 @@
     path: "/home/kevin/.zshrc"
     line: "export PATH=$HOME/.cargo/bin:$PATH"
   when:
-    - default_shell == "zsh"
     - component_zsh
 
 - name: Set Rust Default Toolchain to Nightly
-  command: rustup default nightly
+  shell: "./home/kevin/.cargo/bin/rustup default nightly"
+  ignore_errors: yes
+
+  # TODO double check that this default applies to user and not root
 
 - name: Install the additional rust components
-  command: "rustup component add {{ item }}"
+  command: "/home/kevin/.cargo/bin/rustup component add {{ item }}"
   ignore_errors: yes
   with_items:
     - rustfmt
@@ -54,12 +63,13 @@
     - pkg-config
   when: 
     - ansible_distribution == "Ubuntu"
-    - development_machine or development_component_rust_cargo_extras
+    - component_rust_cargo_extras
 
 # Maybe split these out?
-- name: Install All Cargo Extras 
-  command: "cargo install {{ item }}"
-  with_items:
+- name: Install All Cargo Extras (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install {{ item }}"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  with_items: 
     - cargo-update 
     - cargo-outdated 
     - cargo-graph 
@@ -70,24 +80,102 @@
     - cargo-count 
     - cargo-bloat 
     - cargo-cache 
-    - ripgrep 
-    - exa 
-    - skim 
-    - mdbook 
-    - bat 
-    - fd-find 
-    - tokei 
-    - clog-cli 
-    - hexyl   
   when: 
     - component_rust_cargo_extras
+
+- name: Install Ripgrep (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install ripgrep"
+  args:
+    creates: /home/kevin/.cargo/bin/rg
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  when: 
+    - component_rust_ripgrep
+
+- name: Install CW (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install cw"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/cw
+  when: 
+    - component_rust_cw
+
+- name: Install exa (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install exa"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/exa
+  when: 
+    - component_rust_exa
+
+- name: Install skim (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install skim"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/sk
+  when: 
+    - component_rust_skim
+
+- name: Install mdbook (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install mdbook"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/mdbook
+  when: 
+    - component_rust_mdbook
+
+- name: Install bat (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install bat"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/bat
+  when: 
+    - component_rust_bat
+
+- name: Install fd-find (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install fd-find"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/fd
+  when: 
+    - component_rust_fd
+
+- name: Install tokei (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install tokei"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/tokei
+  when: 
+    - component_rust_tokei
+
+- name: Install clog (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install clog-cli"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/clog
+  when: 
+    - component_rust_clog
+
+- name: Install hexl (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install hexl"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/hexl
+  when: 
+    - component_rust_hexl
+
+- name: Install hyperfine (Cargo)
+  command: "/home/kevin/.cargo/bin/cargo install hyperfine"
+  ignore_errors: yes # Some require nightly, etc. we can also do this later
+  args:
+    creates: /home/kevin/.cargo/bin/hyperfine
+  when: 
+    - component_rust_hyperfine
 
 # this will add the line over and over
 - name: Copy Rust setting to ZSH profile
   shell: "cat /home/kevin/.dotfiles/zsh/addons/rust.zsh-addon >> /home/kevin/.zshrc"
   when: 
     - component_dotfiles
-    - default_shell == "zsh"
     - component_zsh
 
 - name: Clone ASCIInema repository
@@ -98,7 +186,7 @@
     - component_asciinema
 
 - name: Build the ASCIInema Project
-  command: cargo build --release
+  command: "/home/kevin/.cargo/bin/cargo build --release"
   args:
     chdir: /home/kevin/.build/asciinema
     creates: /home/kevin/.build/asciinema/target/release/asciinema

@@ -1,5 +1,7 @@
 ---
 - name: Install pip (Ubuntu)
+  become: yes
+  become_user: root
   apt:
     name: python-pip
     state: latest
