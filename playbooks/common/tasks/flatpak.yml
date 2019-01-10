@@ -1,0 +1,24 @@
+---
+- name: Add Flatpak PPA (Ubuntu)
+  apt_repository:
+    repo: ppa:alexlarsson/flatpak 
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_release != "cosmic"
+
+- name: Install Flatpak (Ubuntu)
+  apt:
+    name: flatpak
+    state: latest
+    update_cache: yes
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: Install Flathub Repository (Flatpak)
+  flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+  when: 
+    - component_flatpak_flathub
+    

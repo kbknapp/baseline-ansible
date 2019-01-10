@@ -1,0 +1,15 @@
+---
+- name: Add Snapd (Fedora)
+  dnf:
+    name: snapd
+    state: latest
+  when: 
+    - ansible_distribution == "Fedora"
+
+- name: Fix Links for Snapd (Fedora)
+  file:
+    src: "/var/lib/snapd/snap"
+    dest: "/snap"
+    state: link
+  when: 
+    - ansible_distribution == "Fedora"

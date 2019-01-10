@@ -1,15 +1,3 @@
 ---
 # tasks file for desktop
 - include: install_packages.yml
-- include: flatpak.yml
-  when:
-    - component_flatpak
-- include: pip.yml
-  when:
-    - component_pip
-- include: snap.yml
-  when:
-    - component_snap
-- include: npm.yml
-  when:
-    - component_npm

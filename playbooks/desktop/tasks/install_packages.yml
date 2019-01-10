@@ -50,3 +50,57 @@
     - ansible_distribution == "Ubuntu"
     - component_gui
     - component_keybase
+
+- name: Install Discord (Flatpak)
+  flatpak:
+    name: com.discordapp.Discord
+    state: present
+  when: 
+    - component_discord
+    - component_flatpak
+    - component_gui
+
+- name: Install Slack (Flatpak)
+  flatpak:
+    name: com.slack.Slack
+    state: present
+  when: 
+    - component_slack
+    - component_gui
+    - component_flatpak
+
+- name: Install Signal (Flatpak)
+  flatpak:
+    name: org.signal.Signal
+    state: present
+  when: 
+    - component_signal
+    - component_gui
+    - component_flatpak
+
+- name: Install Telegram (Flatpak)
+  flatpak:
+    name: org.telegram.desktop
+    state: present
+  when: 
+    - component_telegram
+    - component_gui
+    - component_flatpak
+
+- name: Install Dropbox (Flatpak)
+  flatpak:
+    name: com.dropbox.Client
+    state: present
+  when: 
+    - component_dropbox
+    - component_gui
+    - component_flatpak
+
+- name: Install Mailspring (Snap)
+  command: snap install mailspring --classic
+  args:
+    creates: /snap/mailspring
+  when:
+    - component_gui
+    - component_mailspring
+    - component_snap

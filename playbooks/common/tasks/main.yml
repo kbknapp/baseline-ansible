@@ -2,6 +2,18 @@
 - include: update_system.yml
 - include: install_packages.yml
 - include: common_directories.yml
+- include: flatpak.yml
+  when:
+    - component_flatpak
+- include: pip.yml
+  when:
+    - component_pip
+- include: snap.yml
+  when:
+    - component_snap
+- include: npm.yml
+  when:
+    - component_npm
 
 - include: kubuntu_backports.yml
   when: 

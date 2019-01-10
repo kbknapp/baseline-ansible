@@ -1,8 +1,0 @@
----
-- name: Install Mailspring (Snap)
-  command: snap install mailspring --classic
-  args:
-    creates: /snap/mailspring
-  when:
-    - component_gui
-    - component_mailspring
