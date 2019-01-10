@@ -13,7 +13,7 @@
     mode: 0755
 
 - name: Set NPM prefix
-  command: "npm config set prefix '~/.npm-global'"
+  command: "npm config set prefix '/home/kevin/.npm-global'"
 
 - name: Add NPM global dir to $PATH (ZSH)
   lineinfile:

@@ -89,3 +89,5 @@
         autoremove: yes
       when:
         - ansible_distribution = "Ubuntu"
+    - name: Re-Own all Files in Home Dir
+      command: "chown -R kevin:kevin /home/kevin"
