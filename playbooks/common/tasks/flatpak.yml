@@ -19,6 +19,8 @@
     - ansible_distribution == "Ubuntu"
 
 - name: Install Flathub Repository (Flatpak)
+  become: yes
+  become_user: root
   flatpak_remote:
     name: flathub
     state: present
