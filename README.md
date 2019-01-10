@@ -1,4 +1,13 @@
-`satctl-ansible` 
-===
+Set all vars in `playbooks/baseline.yml`
 
-These ansible scripts were originally adapted from `streisand` commit: `fcfb0d560cd4c8fa20e55c5a49ac111bf80b175b` which can be found at: https://github.com/StreisandEffect/streisand
+Run with:
+
+```
+$ ansible-playbook playbooks/baseline.yml --ask-become-pass
+```
+
+Ubuntu Requirements:
+
+* `ansible`
+* `aptitude`
+* `git`

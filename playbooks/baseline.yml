@@ -1,0 +1,91 @@
+---
+- hosts: localhost
+  become: yes
+  vars:
+    gpg_key_id: 17218E4B3692F01A
+
+    # Default shell (supported: fish, zsh, bash)
+    # This also determines other things like shell
+    # helpers and themes
+    default_shell: fish
+
+    # For GUI machines only
+    gui_kde: True
+
+    # Individual Components (can pick multiple)
+    # Personal
+    component_dotfiles: yes
+    component_fonts_firacode: yes
+    component_common_projects: yes
+    # CLI components
+    component_npm: yes
+    component_flatpak: yes
+    component_flatpak_flathub: yes
+    component_snap: yes
+    component_pip: yes
+    component_git: yes
+    component_fish: yes
+    component_fish_oh_my_fish: yes
+    component_zsh: no
+    component_zsh_oh_my_zsh: no
+    component_gpg: yes
+    component_ssh: yes
+    component_ssh_new_keys: yes
+    component_ssh_server: yes
+    # CLI Apps
+    component_rtv: yes
+    component_asciinema: yes # requires Rust
+    # CLI Apps Dev
+    component_vim: yes
+    component_rust: yes
+    component_rust_cargo_extras: yes
+    # CLI Apps Laptop
+    component_tlp: yes
+    component_powertop: yes
+    # CLI Apps Work
+    component_lxd: yes
+    component_docker: yes
+    component_vpnarea: yes
+    # GUI Components
+    component_gui: yes
+    component_kubuntu_backports: yes
+    # GUI Apps
+    component_mailspring: no
+    component_tilix: yes
+    component_keybase: yes
+    component_dropbox: yes
+    component_buttercup: yes
+    component_mpv: yes
+    component_timeshift: yes
+    component_chrome: yes
+    # GUI Apps Games
+    component_steam: no
+    # GUI Apps Work
+    component_vmware: yes
+    component_standard_notes: yes
+    # GUI Apps Communication
+    component_slack: yes
+    component_signal: yes
+    component_telegram: yes
+    component_discord: yes
+    # Dev GUI Apps
+    component_gitkraken: yes
+    component_meld: yes
+    component_clion: yes
+    component_vscode: yes
+    # Settings
+    component_swapfile: yes
+  roles:
+    - common
+    - server
+    - development
+    - desktop
+    - work
+    - gaming
+
+  post_tasks:
+    - name: Autoremove Packages (Ubuntu)
+      apt:
+        autoremove: yes
+      when:
+        - ansible_distribution = "Ubuntu"

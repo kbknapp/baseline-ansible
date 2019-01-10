@@ -1,0 +1,42 @@
+---
+- name: Add Fish v2 PPA (Ubuntu)
+  apt_repository:
+    repo: ppa:fish-shell/release-2
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_release != "cosmic"
+
+- name: Add Fish v3 PPA (Ubuntu)
+  apt_repository:
+    repo: ppa:fish-shell/release-3
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_release == "cosmic"
+
+- name: Install FISH (Ubuntu)
+  apt:
+    name: fish
+    state: latest
+  when: 
+    - ansible_distribution == "Ubuntu"
+    
+- name: Create common directories
+  file:
+    path: "/home/kevin/{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - .build
+    - .tmp
+    - .local/bin
+    - .bin
+    - Projects
+
+- name: Fix $PATH for common directories (FISH)
+  lineinfile:
+    path: "/home/kevin/.config/fish/config.fish"
+    line: "set -gx PATH /home/kevin/{{ item }} $PATH"
+    create: yes
+  with_items:
+    - .bin
+    - .local/bin

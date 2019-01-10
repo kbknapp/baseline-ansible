@@ -1,0 +1,10 @@
+---
+- include: update_system.yml
+- include: install_packages.yml
+- include: common_directories.yml
+
+- include: kubuntu_backports.yml
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_gui
+    - gui_kde or component_kubuntu_backports

@@ -1,0 +1,8 @@
+---
+- name: Install pip (Ubuntu)
+  apt:
+    name: python-pip
+    state: latest
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_pip

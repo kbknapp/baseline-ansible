@@ -1,5 +1,0 @@
-[satellite-puppet4]
-name=satellite-puppet4
-baseurl=file:///media/sat6/addons/Puppet4
-enabled=1
-gpgcheck=1

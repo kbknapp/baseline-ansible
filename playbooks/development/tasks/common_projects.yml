@@ -1,0 +1,14 @@
+---
+- name: Clone Common Project Repository
+  git:
+    repo: "{{ item.url }}"
+    dest: /home/kevin/Projects/{{ item.repo }}
+  with_items:
+    - { url: "https://github.com/clap-rs/clap", repo: clap }
+    - { url: "https://github.com/clap-rs/clap", repo: clap_derive }
+    - { url: "https://github.com/clap-rs/clap", repo: clap_generate }
+    - { url: "https://github.com/clap-rs/clap", repo: term_size-rs }
+    - { url: "https://versionctl.com/sc/docs.git", repo: term_size-rs }
+  when:
+    - component_git
+    - component_common_projects

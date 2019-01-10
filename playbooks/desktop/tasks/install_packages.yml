@@ -1,0 +1,52 @@
+---
+- name: Install tilix (Ubuntu)
+  apt:
+    name: tilix
+    state: latest
+    update_cache: yes
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_gui
+    - component_tilix
+
+- name: Create symbolic link to fix tilix (Ubuntu)
+  file:
+    src: "/etc/profile.d/vte-2.91.sh"
+    dest: "/etc/profile.d/vte.sh"
+    state: link
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_gui
+    - component_tilix
+
+- name: Install mpv player (Ubuntu)
+  apt:
+    name: mpv
+    state: latest
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_gui
+    - component_mpv
+
+- name: Install rtv (Ubuntu)
+  apt:
+    name: rtv
+    state: latest
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_rtv
+
+- name: Download and Install Keybase (Ubuntu)
+  apt:
+    deb: "https://prerelease.keybase.io/keybase_amd64.deb"
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_gui
+    - component_keybase
+
+- name: Install missing packages (Ubuntu)
+  command: apt-get -y install -f
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_gui
+    - component_keybase

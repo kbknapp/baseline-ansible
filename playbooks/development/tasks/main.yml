@@ -1,0 +1,16 @@
+---
+# tasks file for development
+- include: install_packages.yml
+- include: dotfiles.yml
+- include: vim.yml
+  when: 
+    - component_vim
+- include: git.yml
+  when: 
+    - component_git
+- include: rust.yml
+  when: 
+    - component_rust
+- include: lxd.yml
+  when:
+    - component_lxd

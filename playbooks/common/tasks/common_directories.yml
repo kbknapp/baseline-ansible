@@ -1,0 +1,12 @@
+---
+- name: Create common directories
+  file:
+    path: "/home/kevin/{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - .build
+    - .tmp
+    - .local/bin
+    - .bin
+    - Projects

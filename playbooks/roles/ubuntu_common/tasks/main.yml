@@ -1,3 +1,0 @@
----
-- import_tasks: install_software.yml
-- import_tasks: setup_ppas.yml

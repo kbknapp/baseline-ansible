@@ -1,0 +1,11 @@
+---
+- name: Install Common Packages (Ubuntu)
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - curl 
+    - xclip
+  when: 
+    - ansible_distribution == "Ubuntu"

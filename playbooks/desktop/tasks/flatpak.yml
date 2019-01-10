@@ -1,0 +1,63 @@
+---
+- name: Add Flatpak PPA (Ubuntu)
+  apt_repository:
+    repo: ppa:alexlarsson/flatpak 
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_release != "cosmic"
+
+- name: Install Flatpak (Ubuntu)
+  apt:
+    name: flatpak
+    state: latest
+    update_cache: yes
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: Install Flathub Repository (Flatpak)
+  flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+  when: 
+    - component_flatpak_flathub
+    
+- name: Install Discord (Flatpak)
+  flatpak:
+    name: com.discordapp.Discord
+    state: present
+  when: 
+    - component_discord
+    - component_gui
+
+- name: Install Slack (Flatpak)
+  flatpak:
+    name: com.slack.Slack
+    state: present
+  when: 
+    - component_slack
+    - component_gui
+
+- name: Install Signal (Flatpak)
+  flatpak:
+    name: org.signal.Signal
+    state: present
+  when: 
+    - component_signal
+    - component_gui
+
+- name: Install Telegram (Flatpak)
+  flatpak:
+    name: org.telegram.desktop
+    state: present
+  when: 
+    - component_telegram
+    - component_gui
+
+- name: Install Dropbox (Flatpak)
+  flatpak:
+    name: com.dropbox.Client
+    state: present
+  when: 
+    - component_dropbox
+    - component_gui

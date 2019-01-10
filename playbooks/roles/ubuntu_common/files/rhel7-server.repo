@@ -1,8 +1,0 @@
-[InstallMedia]
-name=Red Hat Enterprise Linux 7.5
-mediaid=1521745267.626363
-metadata_expire=-1
-gpgcheck=0
-cost=500
-baseurl=file:///media/rhel7-server/
-enabled=1

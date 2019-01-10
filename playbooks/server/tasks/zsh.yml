@@ -1,0 +1,38 @@
+---
+- name: Install ZSH (Ubuntu)
+  apt:
+    name: zsh
+    state: latest
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - component_zsh
+
+- name: Clone oh-my-zsh repository
+  git:
+    repo: https://github.com/robbyrussell/oh-my-zsh
+    dest: /home/kevin/.oh-my-zsh
+  when:
+    - component_zsh_oh_my_zsh
+
+- name: Copy ZSH theme from dotfiles to oh-my-zsh
+  command: "cp /home/kevin/.dotfiles/zsh/kustom-linux.zsh-theme /home/kevin/.oh-my-zsh/themes"
+  args:
+    creates: /home/kevin/.oh-my-zsh/themes/kustom-linux.zsh-theme
+  when: 
+    - desktop_component_dotfiles
+    - component_zsh_oh_my_zsh
+
+- name: Copy ZSH profile from dotfiles 
+  command: "cp /home/kevin/.dotfiles/zsh/zshrc-linux /home/kevin/.zshrc"
+  args:
+    creates: /home/kevin/.zshrc
+  when: 
+    - component_dotfiles
+
+- name: Fix $PATH for common directories (ZSH)
+  lineinfile:
+    path: "/home/kevin/.zshrc"
+    line: "export PATH=$HOME/{{ item }}:$PATH"
+  with_items:
+    - .bin
+    - .local/bin
